@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'pfnl.apps.PfnlConfig',
+    'rest_framework',
+    'pfnl_api.apps.PfnlApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
