@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from .choices import PRODUCT_TYPES
 
 # TODO: add validator for the phone field/make sure it is the correct type
