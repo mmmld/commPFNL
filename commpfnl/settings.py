@@ -13,9 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 
 import os
-from dotenv import load_dotenv
-load_dotenv()
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+# from dotenv import load_dotenv
+# load_dotenv()
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,7 +30,7 @@ SECRET_KEY = SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['lou.pythonanywhere.com', '127.0.0.1']
+ALLOWED_HOSTS = ['lou.pythonanywhere.com']
 
 
 # Application definition
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'pfnl.apps.PfnlConfig',
     'pfnl_api.apps.PfnlApiConfig',
-    'rest_framework.authtoken',
+    # 'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -124,7 +124,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -135,5 +137,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ]
 }
