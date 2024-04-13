@@ -9,4 +9,15 @@ PRODUCT_TYPES = {
     "HN": "Huile de neem"
 }
 
+
+PRODUCT_QUANTITIES = {
+    "None": "",
+    "AK": "kilo",
+    "BK": "kilo",
+    "SO": "unité",
+    "BS": "unité",
+    "JS": "littre",
+    "SN": "unité",
+    "HN": "littre"
+}
 # define in different languages, have the voice label attached to it?

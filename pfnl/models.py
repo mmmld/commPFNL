@@ -1,9 +1,11 @@
 from django.db import models
 from .choices import PRODUCT_TYPES
+from django.contrib.auth.models import User
 
 # TODO: add validator for the phone field/make sure it is the correct type
 
 class Cooperative(models.Model):
+    manager = models.ForeignKey(User, on_delete=models.CASCADE)
     coop_name = models.CharField("Nom de la coopérative", max_length=50)
     coop_phone = models.CharField("Numéro de téléphone", max_length=14, unique=True)
     offered_product_1 = models.CharField("Produit offert 1", max_length=10, choices=PRODUCT_TYPES, default="None")

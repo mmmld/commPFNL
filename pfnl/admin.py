@@ -16,7 +16,7 @@ class ProductInline(admin.TabularInline):
     
 class CooperativeAdmin(admin.ModelAdmin):
     fieldsets = [
-        ("Renseignements", {"fields": ["coop_name", "coop_phone"]}),
+        ("Renseignements", {"fields": ["coop_name", "coop_phone", "manager"]}),
         ("Produits offerts", {"fields": ["offered_product_1", "offered_product_2", "offered_product_3"]})
     ]
     inlines = [MemberInline]
@@ -24,6 +24,13 @@ class CooperativeAdmin(admin.ModelAdmin):
     def get_number_members(self, obj):
         return obj.member_set.count()
     get_number_members.short_description = "Nombre de membre"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(manager=request.user)
+
 
 class CoopNameListFilter(admin.SimpleListFilter):
     title = _("Coopérative")
@@ -49,6 +56,12 @@ class MemberAdmin(admin.ModelAdmin):
         return obj.coop.coop_name
     
     get_coop_name.short_description = 'Coopérative'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(coop__manager=request.user)
     
 
     
