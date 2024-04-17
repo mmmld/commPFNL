@@ -10,7 +10,7 @@ class CooperativeSerializer(serializers.ModelSerializer):
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ["id", "member_name", "member_phone", "coop"]
+        fields = ["id", "member_name", "member_phone", "coop", "telegram_id"]
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

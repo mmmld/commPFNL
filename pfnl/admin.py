@@ -46,7 +46,7 @@ class CoopNameListFilter(admin.SimpleListFilter):
 
 class MemberAdmin(admin.ModelAdmin):
     fieldsets = [
-        ("Renseignements", {"fields": ["member_name", "member_phone", "coop"]})
+        ("Renseignements", {"fields": ["member_name", "member_phone", "coop", "telegram_id"]})
     ]
     inlines = [ProductInline]
     list_display = ["member_name", "member_phone", 'get_coop_name']

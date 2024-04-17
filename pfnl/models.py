@@ -31,6 +31,7 @@ class Member(models.Model):
     coop = models.ForeignKey(Cooperative, on_delete=models.CASCADE)
     member_name = models.CharField("Nom du membre", max_length=50)
     member_phone = models.CharField("Numéro de téléphone", max_length=14, unique=True)
+    telegram_id = models.IntegerField("ID telegram", default=0)
     def __str__(self):
         return f'{self.member_name}'
     
@@ -42,7 +43,7 @@ class Member(models.Model):
 
 class Product(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
-    prod_type = models.CharField("Type de produit", max_length=10, editable=False)
+    prod_type = models.CharField("Type de produit", max_length=10)
     quantity = models.IntegerField("Quantité", default=0)
     last_modified = models.DateField("Dernière modification", auto_now_add=True)
     def __str__(self):

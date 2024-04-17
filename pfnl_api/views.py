@@ -8,34 +8,54 @@ from .serializers import MemberSerializer, ProductSerializer
 from django.utils import timezone
 
 class MemberListApiView(APIView):
-
     def get(self, request, *args, **kwargs):
         members = Member.objects.all()
         serializer = MemberSerializer(members, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class MemberRetrieveApiView(APIView):
-
-    def get(self, request, phone, *args, **kwargs):
+class MemberSearchApiView(APIView):
+    def get(self, request, *args, **kwargs):
             try:
-                member = Member.objects.get(member_phone=phone)                 
+                phone = request.data.get('phone')
+                print(request)
+                member = Member.objects.get(member_phone=phone)
                 serializer = MemberSerializer(member)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Member.DoesNotExist:
                  return Response(
-                    {"res": "Member with this phone number does not exists"},
+                    {"res": "Member with this phone number does not exist."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        
+            
+
+class MemberEditApiView(APIView):
+    def put(self, request, member_id, *args, **kwargs):
+        try:
+            member = Member.objects.get(id=member_id)
+            data = {
+                     'telegram_id': request.data.get('telegram_id'),
+                }
+            serializer = MemberSerializer(instance = member, data=data, partial = True)
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Member.DoesNotExist:
+            return Response(
+                                {"res": "Member with this ID does not exist."},
+                                status=status.HTTP_400_BAD_REQUEST
+                            )
+    
     
 
 class MemberRetrieveProductsApiView(APIView):
-
-    def get(self, request, phone, *args, **kwargs):
-            member = Member.objects.filter(member_phone=phone).first()
+    def get(self, request, telegram_id, *args, **kwargs):
+            member = Member.objects.get(telegram_id=telegram_id)
             if member == None:
                  return Response(
-                    {"res": "Member with this phone number does not exists"},
+                    {"res": "Member with this phone number does not exist."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
@@ -55,7 +75,7 @@ class ProductRetrieveApiView(APIView):
 
             except Product.DoesNotExist:
                 return Response(
-                                    {"res": "Product with this ID does not exists"},
+                                    {"res": "Product with this ID does not exist."},
                                     status=status.HTTP_400_BAD_REQUEST
                                 )
 
@@ -67,6 +87,7 @@ class ProductRetrieveApiView(APIView):
                      'last_modified': timezone.now()
                 }
                 serializer = ProductSerializer(instance = product, data=data, partial = True)
+                print(serializer)
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -74,6 +95,6 @@ class ProductRetrieveApiView(APIView):
 
             except Product.DoesNotExist:
                 return Response(
-                                    {"res": "Product with this ID does not exists"},
+                                    {"res": "Product with this ID does not exist."},
                                     status=status.HTTP_400_BAD_REQUEST
                                 )
