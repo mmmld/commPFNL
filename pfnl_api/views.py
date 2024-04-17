@@ -26,7 +26,7 @@ class MemberSearchApiView(APIView):
                     {"res": "Member with this phone number does not exist."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
 
 class MemberEditApiView(APIView):
     def put(self, request, member_id, *args, **kwargs):
