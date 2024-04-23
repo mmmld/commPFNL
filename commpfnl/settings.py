@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'pfnl.apps.PfnlConfig',
     'pfnl_api.apps.PfnlApiConfig',
+    "phonenumber_field",
     # 'rest_framework.authtoken',
 ]
 
@@ -142,3 +143,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+PHONENUMBER_DEFAULT_REGION = "BF"

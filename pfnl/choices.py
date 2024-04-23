@@ -6,7 +6,14 @@ PRODUCT_TYPES = {
     "BS": "Biscuit de pain de singe",
     "JS": "Jus de pain de singe",
     "SN": "Savon de neem",
-    "HN": "Huile de neem"
+    "HN": "Huile de neem",
+    "PM": "Poudre de moringa",
+    "PB": "Poudre de baobab",
+    "TS": "Tisane",
+    "ML": "Miel",
+    "FB": "Feuilles de balanites",
+    "JB": "Jus de balanites",
+    "ZM": "Zamenin"  # zamninga en mooré
 }
 
 

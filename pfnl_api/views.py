@@ -5,6 +5,8 @@ from rest_framework import status
 from pfnl.models import Member, Product
 from .serializers import MemberSerializer, ProductSerializer
 
+from django.db.models import Q
+
 from django.utils import timezone
 
 class MemberListApiView(APIView):
@@ -17,8 +19,13 @@ class MemberSearchApiView(APIView):
     def get(self, request, *args, **kwargs):
             try:
                 phone = request.data.get('phone')
-                print(request)
-                member = Member.objects.get(member_phone=phone)
+                # member = Member.objects.get(member_phone=phone)
+                member = Member.objects.filter(Q(member_phone__icontains=phone)).first()
+                if member == None:
+                     return Response(
+                        {"res": "Member with this phone number does not exist."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
                 serializer = MemberSerializer(member)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Member.DoesNotExist:
@@ -52,17 +59,17 @@ class MemberEditApiView(APIView):
 
 class MemberRetrieveProductsApiView(APIView):
     def get(self, request, telegram_id, *args, **kwargs):
-            member = Member.objects.get(telegram_id=telegram_id)
-            if member == None:
-                 return Response(
-                    {"res": "Member with this phone number does not exist."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            products = member.product_set.all()
-                 
-            serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        member = Member.objects.get(telegram_id=telegram_id)
+        if member == None:
+                return Response(
+                {"res": "Member with this phone number does not exist."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        products = member.product_set.all()
+                
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
             
 class ProductRetrieveApiView(APIView):
@@ -87,7 +94,6 @@ class ProductRetrieveApiView(APIView):
                      'last_modified': timezone.now()
                 }
                 serializer = ProductSerializer(instance = product, data=data, partial = True)
-                print(serializer)
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)

@@ -23,3 +23,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('pnfl_api/', include(pfnl_urls)),
 ]
+
+admin.site.site_title = "PFNL admin (DEV)"
+admin.site.site_header = "PFNLcomm administration"
+admin.site.index_title = "Site administration"
