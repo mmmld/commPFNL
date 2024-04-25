@@ -36,6 +36,17 @@ class MemberSearchApiView(APIView):
 
 
 class MemberEditApiView(APIView):
+    def get(self, request, member_id, *args, **kwargs):
+        try:
+            member = Member.objects.get(telegram_id=member_id)
+            serializer = MemberSerializer(member)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Member.DoesNotExist:
+            return Response(
+                                {"res": "Member with this ID does not exist."},
+                                status=status.HTTP_400_BAD_REQUEST
+                            )
+
     def put(self, request, member_id, *args, **kwargs):
         try:
             member = Member.objects.get(id=member_id)
@@ -43,7 +54,6 @@ class MemberEditApiView(APIView):
                      'telegram_id': request.data.get('telegram_id'),
                 }
             serializer = MemberSerializer(instance = member, data=data, partial = True)
-            print(serializer)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
