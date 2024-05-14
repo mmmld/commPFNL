@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from .models import Cooperative, Member, Product
+from .models import Cooperative, Member, Product, ArtemisiaSeller, ArtemisiaProduct
 from django.db.models import Q
 
 @receiver(pre_save, sender=Member)
@@ -48,4 +48,14 @@ def update_products_on_cooperative_save(sender, instance, created, **kwargs):
         
         for product_type in product_types_to_add:
             Product.objects.create(member=member, prod_type=product_type)
-    
+
+@receiver(pre_save, sender=ArtemisiaProduct)
+def ensure_only_type_of_product_per_seller(sender, instance, **kwargs):
+    seller = instance.seller
+    products_of_seller = seller.artemisiaproduct_set.values_list("prod_type", flat=True)
+    type_product = instance.prod_type
+    if type_product in products_of_seller:
+      old_product = seller.artemisiaproduct_set.get(prod_type=type_product)
+      old_product.delete()
+
+

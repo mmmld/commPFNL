@@ -1,5 +1,5 @@
 from django.db import models
-from .choices import PRODUCT_TYPES
+from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -11,7 +11,7 @@ class Cooperative(models.Model):
     coop_phone = PhoneNumberField("Numéro de téléphone", blank=True, unique=True)
     offered_product_1 = models.CharField("Produit offert 1", max_length=10, choices=PRODUCT_TYPES, default="None")
     offered_product_2 = models.CharField("Produit offert 2", max_length=10, choices=PRODUCT_TYPES, default="None")
-    offered_product_3 = models.CharField("Produit offert 1", max_length=10, choices=PRODUCT_TYPES, default="None")
+    offered_product_3 = models.CharField("Produit offert 3", max_length=10, choices=PRODUCT_TYPES, default="None")
     def __str__(self):
         return self.coop_name
     
@@ -41,7 +41,6 @@ class Member(models.Model):
 
 
 
-
 class Product(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     prod_type = models.CharField("Type de produit", max_length=10)
@@ -49,5 +48,20 @@ class Product(models.Model):
     last_modified = models.DateField("Dernière modification", auto_now_add=True)
     def __str__(self):
         return PRODUCT_TYPES[self.prod_type]
+
+
+class ArtemisiaSeller(models.Model):
+    name = models.CharField(max_length=200)
+    phone = PhoneNumberField("Numéro de téléphone", blank=True, unique=True)
+    telegram_id = models.IntegerField("ID telegram", default=0)
+
+class ArtemisiaProduct(models.Model):
+    seller = models.ForeignKey(ArtemisiaSeller, on_delete=models.CASCADE)
+    prod_type = models.CharField("Type de produit", max_length=10, choices=ARTEMISIA_PRODUCTS, default="None")
+    quantity = models.IntegerField("Quantité", default=0)
+    price = models.IntegerField("Prix", default=0)
+    last_modified = models.DateField("Dernière modification", auto_now_add=True)
+    def __str__(self):
+        return ARTEMISIA_PRODUCTS[self.prod_type]
 
 

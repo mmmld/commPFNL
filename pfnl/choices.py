@@ -28,3 +28,10 @@ PRODUCT_QUANTITIES = {
     "HN": "littre"
 }
 # define in different languages, have the voice label attached to it?
+
+ARTEMISIA_PRODUCTS = {
+    "None": "",
+    "TA": "Tisane",
+    "PA": "Pied",
+    "SA": "Graine"
+}

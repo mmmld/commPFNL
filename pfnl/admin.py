@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .models import Cooperative, Member, Product
+from .models import Cooperative, Member, Product, ArtemisiaSeller, ArtemisiaProduct
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .choices import PRODUCT_TYPES
+from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -15,6 +15,11 @@ class ProductInline(admin.TabularInline):
     model = Product
     extra = 0
     fields = ["quantity"]
+
+class ArtemisiaProductInline(admin.TabularInline):
+    model = ArtemisiaProduct
+    extra = 0
+    fields = ["prod_type", "quantity", "price"]
     
 class CooperativeAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -72,8 +77,17 @@ class MemberAdmin(admin.ModelAdmin):
         return qs.filter(coop__manager=request.user)
     
 
+class ArtemisiaSellerAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("Renseignements", {"fields": ["name", "phone"]})
+    ]
+    inlines = [ArtemisiaProductInline]
+
+    list_display = ["name", "phone"]
+    search_fields = ["name", "phone"]
+
     
 
 admin.site.register(Cooperative, CooperativeAdmin)
 admin.site.register(Member, MemberAdmin)
-# admin.site.register(Product, ProductAdmin)
+admin.site.register(ArtemisiaSeller, ArtemisiaSellerAdmin)

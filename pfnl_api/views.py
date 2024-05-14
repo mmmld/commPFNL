@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 # from rest_framework import permissions
-from pfnl.models import Member, Product
-from .serializers import MemberSerializer, ProductSerializer
+from pfnl.models import Member, Product, ArtemisiaSeller, ArtemisiaProduct
+from .serializers import MemberSerializer, ProductSerializer, ArtemisiaProductSerializer, ArtemisiaSellerSerializer
 
 from django.db.models import Q
 
@@ -110,6 +110,111 @@ class ProductRetrieveApiView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             except Product.DoesNotExist:
+                return Response(
+                                    {"res": "Product with this ID does not exist."},
+                                    status=status.HTTP_400_BAD_REQUEST
+                                )
+
+
+# ----------------------- ARTEMISIA --------------------------------------
+
+# TODO:
+    # - GET for artemisia products (to get quantity)
+    # - POST for artemisia products (to create and update)
+
+class ArtemisiaSellerSearchApiView(APIView):
+    def get(self, request, *args, **kwargs):
+            try:
+                phone = request.data.get('phone')
+                seller = ArtemisiaSeller.objects.filter(Q(phone__icontains=phone)).first()
+                if seller == None:
+                     return Response(
+                        {"res": "Seller with this phone number does not exist."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                serializer = ArtemisiaSellerSerializer(seller)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except ArtemisiaSeller.DoesNotExist:
+                 return Response(
+                    {"res": "Seller with this phone number does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+
+class ArtemisiaSellerEditApiView(APIView):
+    def get(self, request, seller_id, *args, **kwargs):
+        try:
+            seller = ArtemisiaSeller.objects.get(telegram_id=seller_id)
+            serializer = ArtemisiaSellerSerializer(seller)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ArtemisiaSeller.DoesNotExist:
+            return Response(
+                                {"res": "Seller with this ID does not exist."},
+                                status=status.HTTP_400_BAD_REQUEST
+                            )
+
+    def put(self, request, seller_id, *args, **kwargs):
+        try:
+            seller = ArtemisiaSeller.objects.get(id=seller_id)
+            data = {
+                     'telegram_id': request.data.get('telegram_id'),
+                }
+            serializer = ArtemisiaSellerSerializer(instance = seller, data=data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except ArtemisiaSeller.DoesNotExist:
+            return Response(
+                                {"res": "Seller with this ID does not exist."},
+                                status=status.HTTP_400_BAD_REQUEST
+                            )
+        
+class ArtemisiaSellerRetrieveProductsApiView(APIView):
+    def get(self, request, telegram_id, *args, **kwargs):
+        seller = ArtemisiaSeller.objects.get(telegram_id=telegram_id)
+        if seller == None:
+                return Response(
+                {"res": "Seller with this phone number does not exist."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        products = seller.artemisiaproduct_set.all()
+                
+        serializer = ArtemisiaProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class ArtemisiaProductRetrieveApiView(APIView):
+
+     def get(self, request, prod_id, *args, **kwargs):
+            try:
+                product = ArtemisiaProduct.objects.get(id=prod_id)
+                serializer = ArtemisiaProductSerializer(product)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            except ArtemisiaProduct.DoesNotExist:
+                return Response(
+                                    {"res": "Product with this ID does not exist."},
+                                    status=status.HTTP_400_BAD_REQUEST
+                                )
+
+     def put(self, request, prod_id, *args, **kwargs):
+            try:
+                product = ArtemisiaProduct.objects.get(id=prod_id)
+                data = {
+                     'quantity': request.data.get('quantity'),
+                     'price': request.data.get('price'),
+                     'last_modified': timezone.now()
+                }
+                serializer = ArtemisiaProductSerializer(instance = product, data=data, partial = True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            except ArtemisiaProduct.DoesNotExist:
                 return Response(
                                     {"res": "Product with this ID does not exist."},
                                     status=status.HTTP_400_BAD_REQUEST
