@@ -2,7 +2,7 @@ PRODUCT_TYPES = {
     "None": "",
     "AK": "Amande de karité",
     "BK": "Beurre de karité",
-    "SO": "Soumabala",
+    "SO": "Soumbala",
     "BS": "Biscuit de pain de singe",
     "JS": "Jus de pain de singe",
     "SN": "Savon de neem",
@@ -31,7 +31,7 @@ PRODUCT_QUANTITIES = {
 
 ARTEMISIA_PRODUCTS = {
     "None": "",
-    "TA": "Tisane",
-    "PA": "Pied",
-    "SA": "Graine"
+    "TA": "Tisane d'artemisia",
+    "PA": "Pied d'artemisia",
+    "SA": "Graine d'artemisia"
 }
