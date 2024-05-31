@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 # from rest_framework import permissions
-from pfnl.models import Member, Product, ArtemisiaSeller, ArtemisiaProduct
-from .serializers import MemberSerializer, ProductSerializer, ArtemisiaProductSerializer, ArtemisiaSellerSerializer
+from pfnl.models import Cooperative, Member, Product, ArtemisiaSeller, ArtemisiaProduct
+from .serializers import CooperativeSerializer, MemberSerializer, ProductSerializer, ArtemisiaProductSerializer, ArtemisiaSellerSerializer
 
 from django.db.models import Q
 
@@ -115,12 +115,21 @@ class ProductRetrieveApiView(APIView):
                                     status=status.HTTP_400_BAD_REQUEST
                                 )
 
+class CooperativeRetrieveApiView(APIView):
+     def get(self, request, coop_id, *args, **kwargs):
+            try:
+                coop = Cooperative.objects.get(id=coop_id)
+                serializer = CooperativeSerializer(coop)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            except Cooperative.DoesNotExist:
+                return Response(
+                                    {"res": "Cooperative with this ID does not exist."},
+                                    status=status.HTTP_400_BAD_REQUEST
+                                )
+
 
 # ----------------------- ARTEMISIA --------------------------------------
-
-# TODO:
-    # - GET for artemisia products (to get quantity)
-    # - POST for artemisia products (to create and update)
 
 class ArtemisiaSellerSearchApiView(APIView):
     def get(self, request, *args, **kwargs):

@@ -8,6 +8,7 @@ urlpatterns = [
     path('member/<int:member_id>/', MemberEditApiView.as_view()),
     path('member/<int:telegram_id>/products/', MemberRetrieveProductsApiView.as_view()),
     path('product/<int:prod_id>/', ProductRetrieveApiView.as_view()),
+    path('cooperative/<int:coop_id>/', CooperativeRetrieveApiView.as_view()),
 
     # ---------- ARTEMISIA -------------
 
