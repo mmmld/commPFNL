@@ -11,6 +11,7 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = ["id", "member_name", "member_phone", "coop", "telegram_id"]
+        depth = 1
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
