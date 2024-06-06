@@ -1,6 +1,6 @@
 from pydub import AudioSegment
-from num_to_text import NumToWords
-from num_to_text_bm import NumToWordsBambara
+from bot.num_to_text import NumToWords
+from bot.num_to_text_bm import NumToWordsBambara
 
 def concat_audios(filenames, output_file):
     """

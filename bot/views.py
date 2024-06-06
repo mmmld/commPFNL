@@ -1,10 +1,10 @@
-import telebot
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import os
 from dotenv import load_dotenv
 
+import telebot
 from telebot.storage import StateMemoryStorage
 from telebot import custom_filters
 from telebot.handler_backends import State, StatesGroup
@@ -14,11 +14,11 @@ import json
 import phonenumbers
 import time
 
-from ..pfnl.choices import ARTEMISIA_PRODUCTS, PRODUCT_TYPES, YES_NO
-# from tts import SpeakMoore
-from num_to_text import NumToWords
-from num_to_text_bm import NumToWordsBambara
-from util import *
+from pfnl.choices import ARTEMISIA_PRODUCTS, PRODUCT_TYPES, YES_NO
+# from bot.tts import SpeakMoore
+from bot.num_to_text import NumToWords
+from bot.num_to_text_bm import NumToWordsBambara
+from bot.util import *
 
 load_dotenv()
 
@@ -33,9 +33,9 @@ PHONE_COUNTRY = "BF"
 if MODE == "PFNL":
     # speaker = SpeakMoore()
     transcriber = NumToWords()
-    BOT_TOKEN = os.getenv("BOT_TOKEN")
+    BOT_TOKEN = os.getenv("PFNL_BOT_TOKEN")
     LANG = "mo"
-else: 
+else:
     BOT_TOKEN = os.getenv("ARTEMISIA_BOT_TOKEN")
     transcriber = NumToWordsBambara()
     ADDITION_URL_MEMBER = "seller/"
@@ -49,10 +49,10 @@ BASE_URL = "https://lou.pythonanywhere.com/pnfl_api/"
 EXPIRATION_MINUTES = 20
 
 state_storage = StateMemoryStorage()
-bot = telebot.TeleBot(BOT_TOKEN, state_storage=state_storage, threaded=False)
+bot = telebot.TeleBot(BOT_TOKEN, threaded=False, state_storage=state_storage)
 
 @csrf_exempt
-def bot(request):
+def run_bot(request):
     if request.META['CONTENT_TYPE'] == 'application/json':
 
         json_data = request.body.decode('utf-8')
@@ -81,7 +81,7 @@ class MyStates(StatesGroup):
 
 def send_voice_message(filename, path, chat_id):
     """
-    Sends a voice message from a file name to the relevant chat 
+    Sends a voice message from a file name to the relevant chat
     """
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendVoice?chat_id={chat_id}'
     files=[
@@ -109,9 +109,11 @@ def start(message):
     keyboard = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True)
     share_button = telebot.types.KeyboardButton(text="Partager contact 📞", request_contact=True)
     keyboard.add(share_button)
-    send_voice_message(f'welcome_{LANG}', f'./audio/welcome_{LANG}.opus', message.chat.id)
+    filename = f'welcome_{LANG}.opus'
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = os.path.join(dir_path, "audio", filename)
+    send_voice_message(filename, path, message.chat.id)
     bot.send_message(message.chat.id, "📞", reply_markup=keyboard)
     bot.set_state(message.from_user.id, MyStates.contact, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['time_set'] = time.time()
-    # bot.add_data(message.from_user.id,message.chat.id, {'time_set': time.time()})
