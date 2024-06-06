@@ -1,6 +1,8 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+
 import os
 from dotenv import load_dotenv
 
@@ -15,6 +17,7 @@ import phonenumbers
 import time
 
 from pfnl.choices import ARTEMISIA_PRODUCTS, PRODUCT_TYPES, YES_NO
+from pfnl.models import Cooperative, Member, Product, ArtemisiaSeller, ArtemisiaProduct
 # from bot.tts import SpeakMoore
 from bot.num_to_text import NumToWords
 from bot.num_to_text_bm import NumToWordsBambara
@@ -100,6 +103,41 @@ def cancel_state(message):
     # bot.send_message(message.chat.id, "Your state was cancelled.")
     bot.delete_state(message.from_user.id, message.chat.id)
 
+def test_phone_number(phone_number, message):
+    """
+    Checks if the phone number exists in the database,
+    if yes, adds the chat_id to the db (if needed)
+    otherwise, prompts the user to first get registered in the system through the radio
+    """
+
+    # TODO add option for seller when in artemisia mode
+
+    member = Member.objects.filter(Q(member_phone__icontains=phone_number)).first()
+    telegram_id = message.chat.id
+    if member == None:
+        # bot.send_message(telegram_id, "Une erreur est survenue. Il semble que votre numéro n'est pas enregistré dans le system. Veuillez vous addressez à la radio pour qu'il vous y ajoute.")
+        send_voice_message(f'error_number_{LANG}', f'./audio/error_number_{LANG}.opus', telegram_id)
+        return
+    if MODE == "PFNL":
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['comm_name'] = member['coop']['coop_name']
+            data['comm_phone'] = member['coop']['coop_phone']
+    else:
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            data['seller_name'] = member['name']
+            data['seller_phone'] = member['phone']
+
+    if member.telegram_id != telegram_id:
+        # response = requests.request("PUT", url + member_id + '/', headers=headers, data={'telegram_id':telegram_id})
+        # data = {
+        #          'telegram_id': 'telegram_id',
+        #     }
+        member.telegram_id = telegram_id
+        member.save()
+    show_products(message)
+        
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
     """
@@ -117,3 +155,21 @@ def start(message):
     bot.set_state(message.from_user.id, MyStates.contact, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['time_set'] = time.time()
+
+@bot.message_handler(commands=['hello'])
+def greet(message):
+    """
+    Start of an interaction with a user, assumes telegram ID is known
+    """
+    telegram_id = message.chat.id
+    # bot.send_message(telegram_id, "Bonjour, voici une liste de vos produits")
+    send_voice_message(f'intro_products_{LANG}', f'./audio/intro_products_{LANG}.opus', message.chat.id)
+    bot.set_state(message.from_user.id, MyStates.product_list, message.chat.id)
+    with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+        data['time_set'] = time.time()
+    # bot.add_data(message.from_user.id,message.chat.id, {'time_set': time.time()})
+    show_products(message)
+
+
+def show_products(message):
+    bot.send_message(message.chat.id, "show products OK")
