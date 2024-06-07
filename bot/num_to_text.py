@@ -1,5 +1,7 @@
 from math import floor
 import phonenumbers
+import os
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 class NumToWords:
     """
@@ -10,7 +12,7 @@ class NumToWords:
     units = ["zaalem", "yen", "yiibu", "tãabo", "naase", "nu", "yoobe", "yopoe", "nii", "wɛ"]
     ten = "piiga"
     tens = ["", "pig", "pisi", "pista", "pis nasse", "pis nu", "pis yoobe", "pis yopoe", "pis nii", "pis wɛ"]
-    hundred = "koabga" 
+    hundred = "koabga"
     hundreds = ["", "koabg", "kobisi", 'kob-s tã', 'kobis nasse', 'kobis nu', 'kobis yoobe', 'kobis yopoe', 'kobis nii', 'kobis wɛ']
     thousand = 'tusri'
     thousands = 'tusr'
@@ -56,7 +58,7 @@ class NumToWords:
 
     def transcribe_for_phone(self, num):
         """
-        
+
         """
         if num == 1:
             return [self.zero, self.one]
@@ -70,13 +72,13 @@ class NumToWords:
             if unit == 0:
                 return [self.tens[dec]]
             return [self.tens[dec], "la", self.units[unit]]
-    
+
     def speak_phone_number(self, phone_number):
-        phone_number = phonenumbers.parse(phone_number, "BF")
-        formatted_number = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.NATIONAL).split(' ')
+        phone_number = phone_number.as_national
+        formatted_number = phone_number.split(' ')
         number_audios = []
         for sub_number in formatted_number:
             sub_res = self.transcribe_for_phone(int(sub_number))
-            number_audios += ["./audio/numbers_moore/" + x + ".opus" for x in sub_res]
-            number_audios.append("./audio/pause.opus")
+            number_audios += [os.path.join(dir_path, "audio", "numbers_moore" , x + ".opus") for x in sub_res]
+            number_audios.append(os.path.join(dir_path, "audio", "pause.opus"))
         return number_audios

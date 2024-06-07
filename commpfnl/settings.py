@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'pfnl.apps.PfnlConfig',
     'pfnl_api.apps.PfnlApiConfig',
+    'bot.apps.BotConfig',
     "phonenumber_field",
     # 'rest_framework.authtoken',
 ]

@@ -2,6 +2,7 @@ from django.db import models
 from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
+from bot.models import State
 
 
 class Cooperative(models.Model):
@@ -14,15 +15,15 @@ class Cooperative(models.Model):
     offered_product_3 = models.CharField("Produit offert 3", max_length=10, choices=PRODUCT_TYPES["fr"], default="None")
     def __str__(self):
         return self.coop_name
-    
+
     def get_total_quantity_first_product(self):
             all_quantities = Product.objects.filter(member__coop=self).filter(prod_type=self.offered_product_1).values_list("quantity", flat=True)
             return sum(all_quantities)
-    
+
     def get_total_quantity_second_product(self):
             all_quantities = Product.objects.filter(member__coop=self).filter(prod_type=self.offered_product_2).values_list("quantity", flat=True)
             return sum(all_quantities)
-    
+
     def get_total_quantity_third_product(self):
             all_quantities = Product.objects.filter(member__coop=self).filter(prod_type=self.offered_product_3).values_list("quantity", flat=True)
             return sum(all_quantities)
@@ -35,7 +36,7 @@ class Member(models.Model):
     telegram_id = models.IntegerField("ID telegram", default=0)
     def __str__(self):
         return f'{self.member_name}'
-    
+
     def get_coop_name(self):
          return self.coop.coop_name
 
