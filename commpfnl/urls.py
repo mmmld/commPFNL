@@ -17,9 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from pfnl_api import urls as pfnl_urls
+from bot.views import run_bot
 
 urlpatterns = [
+    path('bot/', run_bot),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('pnfl_api/', include(pfnl_urls)),
 ]
+
+admin.site.site_title = "PFNL admin (DEV)"
+admin.site.site_header = "PFNLcomm administration"
+admin.site.index_title = "Site administration"

@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 
 import os
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 
@@ -30,7 +30,7 @@ SECRET_KEY = SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['lou.pythonanywhere.com']
+ALLOWED_HOSTS = ['lou.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition
@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'pfnl.apps.PfnlConfig',
     'pfnl_api.apps.PfnlApiConfig',
+    'bot.apps.BotConfig',
+    "phonenumber_field",
     # 'rest_framework.authtoken',
 ]
 
@@ -142,3 +144,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+PHONENUMBER_DEFAULT_REGION = "BF"
