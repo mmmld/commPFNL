@@ -10,6 +10,7 @@ from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
 class MemberInline(admin.TabularInline):
     model = Member
     extra = 1
+    fields = ["member_name", "member_phone"]
 
 class ProductInline(admin.TabularInline):
     model = Product
@@ -20,7 +21,7 @@ class ArtemisiaProductInline(admin.TabularInline):
     model = ArtemisiaProduct
     extra = 0
     fields = ["prod_type", "quantity", "price"]
-    
+
 class CooperativeAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Renseignements", {"fields": ["coop_name", "coop_phone", "manager"]}),
@@ -55,7 +56,7 @@ class CoopNameListFilter(admin.SimpleListFilter):
 
 class MemberAdmin(admin.ModelAdmin):
     fieldsets = [
-        ("Renseignements", {"fields": ["member_name", "member_phone", "coop", "telegram_id"]})
+        ("Renseignements", {"fields": ["member_name", "member_phone", "coop"]})
     ]
     inlines = [ProductInline]
 
@@ -75,7 +76,7 @@ class MemberAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(coop__manager=request.user)
-    
+
 
 class ArtemisiaSellerAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -86,7 +87,7 @@ class ArtemisiaSellerAdmin(admin.ModelAdmin):
     list_display = ["name", "phone"]
     search_fields = ["name", "phone"]
 
-    
+
 
 admin.site.register(Cooperative, CooperativeAdmin)
 admin.site.register(Member, MemberAdmin)
