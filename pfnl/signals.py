@@ -1,10 +1,24 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from .models import Cooperative, Member, Product
+from .models import Cooperative, Member, Product, ArtemisiaSeller, ArtemisiaProduct
 from django.db.models import Q
+
+@receiver(pre_save, sender=Member)
+def reset_telegram_id_on_phone_change(sender, instance, **kwargs):
+  """
+  When member changes their phone number, telegram_id is reset to 0
+  """
+  if instance.id:
+     old = Member.objects.get(id=instance.id)
+     if instance.member_phone != old.member_phone:
+        instance.telegram_id = 0
+
 
 @receiver(post_save, sender=Member)
 def create_products_for_member(sender, instance, created, **kwargs):
+  """
+  When a new member is created, products of the cooperative type are automatically created and linked
+  """
   if created:
     # Access the cooperative object
     cooperative = instance.coop
@@ -16,6 +30,9 @@ def create_products_for_member(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Cooperative)
 def update_products_on_cooperative_save(sender, instance, created, **kwargs):
+  """
+  If the product types of one cooperative changes, they are updated for all its members
+  """
   if not created:  # Only handle updates, not creation
     # Get all members associated with this cooperative
     members = Member.objects.filter(coop=instance)
@@ -31,5 +48,14 @@ def update_products_on_cooperative_save(sender, instance, created, **kwargs):
         
         for product_type in product_types_to_add:
             Product.objects.create(member=member, prod_type=product_type)
-    
-    
+
+@receiver(pre_save, sender=ArtemisiaProduct)
+def ensure_only_type_of_product_per_seller(sender, instance, **kwargs):
+    seller = instance.seller
+    products_of_seller = seller.artemisiaproduct_set.values_list("prod_type", flat=True)
+    type_product = instance.prod_type
+    if type_product in products_of_seller:
+      old_product = seller.artemisiaproduct_set.get(prod_type=type_product)
+      old_product.delete()
+
+
