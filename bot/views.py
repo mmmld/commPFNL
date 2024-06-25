@@ -274,8 +274,6 @@ def edit_product(message):
     chat_id = message.chat.id
     prod = message.text
     state = State.objects.get(telegram_id=chat_id)
-
-
     prod_type = inverted_prod[prod]
 
     filename = str(chat_id) + '_change_product.opus'
@@ -283,7 +281,7 @@ def edit_product(message):
     if LANG == "fr" or LANG == "bm":
         concat_audios([os.path.join(dir_path, 'audio', f'change_quantity_of_{LANG}.opus'), os.path.join(dir_path, 'audio' , f'{prod_type}_{LANG}.opus')], path)
     if LANG == "mo":
-        concat_audios([os.path.join(dir_path, 'audio', 'change_quantity_of_1mo.opus'), os.path.join(dir_path, 'audio', f'{prod_type}_mo.opus'), os.path.join(dir_path, 'audio', 'change_quantity_of_2mo.opus')], path)
+        concat_audios([os.path.join(dir_path, 'audio', f'change_quantity_of_{LANG}.opus'), os.path.join(dir_path, 'audio', f'{prod_type}_{LANG}.opus')], path)
     send_voice_message(filename, path, message.chat.id)
     send_voice_message(f'enter_quantity_{LANG}', os.path.join(dir_path, 'audio', f'enter_quantity_{LANG}.opus'), message.chat.id)
 
@@ -305,16 +303,20 @@ def edit_quantity(message):
         state = State.objects.get(telegram_id=message.chat.id)
         state.quantity = message.text
         state.state = "confirm"
+        prod_name = state.product
         state.save()
+        prod_type = inverted_prod[prod_name]
         if LANG == "fr":
                 bot.send_message(message.chat.id, "Est-vous sûr de vouloir changer la quantité de " + state.product + " pour une quantité de " + message.text)
         if LANG == "mo":
-            txt = "Yam’b rat n’teka a sombl ma " + state.product
-            bot.send_message(message.chat.id, txt)
             filename = str(message.chat.id) + '_ensure_change'
             path = os.path.join(dir_path, 'output', filename + '.ogg')
-            # speaker.speak(txt, filename)
-            # send_voice_message(filename, path, message.chat.id)
+            audios = [os.path.join(dir_path, 'audio', f'change_quantity_of_{LANG}.opus')]
+            nums = transcriber.transcribe(int(message.text))
+            audios += [os.path.join(dir_path, "audio", "numbers_moore" , x + ".opus") for x in nums]
+            audios.append(os.path.join(dir_path, 'audio', f'{prod_type}_mo.opus'))
+            concat_audios(audios, path)
+            send_voice_message(filename, path, message.chat.id)
             if os.path.exists(path):
                 os.remove(path)
 
@@ -356,11 +358,7 @@ def edit_product(message):
 
         filename = str(chat_id) + '_confirm_change'
         path = os.path.join(dir_path, 'output', f'{filename}.ogg')
-        if LANG == "fr" or LANG == "bm":
-            concat_audios([os.path.join(dir_path, 'audio', f'confirm_change1_{LANG}.ogg'), os.path.join(dir_path, 'audio', f'{prod_type}_{LANG}.opus'), os.path.join(dir_path, 'audio', f'confirm_change2_{LANG}.ogg')], path)
-        if LANG == "mo":
-            concat_audios([os.path.join(dir_path, 'audio', 'change_quantity_of_1mo.opus'), os.path.join(dir_path, 'audio', f'{prod_type}_mo.opus') ,os.path.join(dir_path, 'audio', 'change_quantity_of_2mo.opus')], path)
-            bot.send_message(message.chat.id, "La quantité de " + prod_name + " a bien été changé. Voulez-vous changer un autre stock ?")
+        concat_audios([os.path.join(dir_path, 'audio', f'confirm_change1_{LANG}.opus'), os.path.join(dir_path, 'audio', f'{prod_type}_{LANG}.opus'), os.path.join(dir_path, 'audio', f'confirm_change2_{LANG}.opus')], path)
         send_voice_message(filename, path, message.chat.id)
         if os.path.exists(path):
             os.remove(path)

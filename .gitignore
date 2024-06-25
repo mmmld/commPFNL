@@ -1,3 +1,5 @@
 .env
 db.sqlite3
 dq.sqlite3
+bot/__pycache__/*
+pfnl/__pycache__/*
