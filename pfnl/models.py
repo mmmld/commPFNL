@@ -2,12 +2,12 @@ from django.db import models
 from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
-from bot.models import State
-
+# from bot.models import State
 
 class Cooperative(models.Model):
     manager = models.ForeignKey(User, on_delete=models.CASCADE)
     coop_name = models.CharField("Nom de la coopérative", max_length=50)
+    name_audio = models.CharField("Audio du nom de la coopérative", max_length=255)
     # coop_phone = models.CharField("Numéro de téléphone", max_length=14, unique=True)
     coop_phone = PhoneNumberField("Numéro de téléphone", blank=True, unique=True)
     offered_product_1 = models.CharField("Produit offert 1", max_length=10, choices=PRODUCT_TYPES["fr"], default="None")

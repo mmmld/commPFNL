@@ -195,23 +195,29 @@ def show_products(message):
         filename = str(chat_id) + '_quantities'
         path = os.path.join(dir_path, "output", filename + 'ogg')
 
-        text = "yam ‘b paama "
+        # text = "yam ‘b paama "
+        audios = [os.path.join(dir_path, "audio", f"you_have_{LANG}.opus")]
         for prod in products:
             prod_type = prod.prod_type
             if prod_type != "None":
                 prod_name = PRODUCT_TYPES[LANG][prod_type]
                 prod_quantity = prod.quantity
-                text += transcriber.transcribe(prod_quantity)
-                text += " "
-                text += prod_name + ", "
+
+                nums = transcriber.transcribe(prod_quantity)
+                audios += [os.path.join(dir_path, "audio", "numbers_moore" , x + ".opus") for x in nums]
+                # text += " "
+                # text += prod_name + ", "
+                audios.append(os.path.join(dir_path, "audio", f"{prod_type}_{LANG}.opus"))
+                audios.append(os.path.join(dir_path, "audio", "pause.opus"))
                 prod_button = telebot.types.KeyboardButton(text=prod_name)
                 keyboard.add(prod_button)
                 product_ids[prod_name] = (prod.id, prod_type, prod_quantity)
+
         # speaker.speak(text, filename)
+        concat_audios(audios, path)
 
-
-        # send_voice_message(filename, path, chat_id)
-        bot.send_message(chat_id, text)
+        send_voice_message(filename, path, chat_id)
+        # bot.send_message(chat_id, text)
 
         if os.path.exists(path):
             os.remove(path)
@@ -355,8 +361,6 @@ def edit_product(message):
         if LANG == "mo":
             concat_audios([os.path.join(dir_path, 'audio', 'change_quantity_of_1mo.opus'), os.path.join(dir_path, 'audio', f'{prod_type}_mo.opus') ,os.path.join(dir_path, 'audio', 'change_quantity_of_2mo.opus')], path)
             bot.send_message(message.chat.id, "La quantité de " + prod_name + " a bien été changé. Voulez-vous changer un autre stock ?")
-            # text =  prod_name  + " kosma zislma sid tekamé. Yam’b  n’dati toema bumb a too bi ?"
-            # speaker.speak(text, filename)
         send_voice_message(filename, path, message.chat.id)
         if os.path.exists(path):
             os.remove(path)

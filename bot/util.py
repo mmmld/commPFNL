@@ -1,6 +1,7 @@
 from pydub import AudioSegment
 from bot.num_to_text import NumToWords
 from bot.num_to_text_bm import NumToWordsBambara
+from pfnl.models import Cooperative
 
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -19,10 +20,17 @@ def concat_audios(filenames, output_file):
     # simple export
     file_handle = combined_audio.export(output_file, format="ogg")
 
+def get_cooperative_audio_name(name):
+    try:
+        file_path = Cooperative.objects.get(coop_name=name).name_audio
+        return [file_path]
+    except:
+        return []
+
 def make_commpfnl_communique(lang, name, phone, list_products):
     audios = [os.path.join(dir_path, "audio", f"communique1_{lang}.opus")]
 
-    # TODO: add name
+    audios += get_cooperative_audio_name(name)
 
     audios.append(os.path.join(dir_path, "audio", f"communique2_{lang}.opus"))
     for prod_type in list_products:

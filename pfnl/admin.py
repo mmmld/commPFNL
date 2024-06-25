@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
+# from .choices import PRODUCT_TYPES, ARTEMISIA_PRODUCTS
 
 class MemberInline(admin.TabularInline):
     model = Member
@@ -24,7 +24,7 @@ class ArtemisiaProductInline(admin.TabularInline):
 
 class CooperativeAdmin(admin.ModelAdmin):
     fieldsets = [
-        ("Renseignements", {"fields": ["coop_name", "coop_phone", "manager"]}),
+        ("Renseignements", {"fields": ["coop_name", "coop_phone", "manager", "name_audio"]}),
         ("Produits offerts", {"fields": ["offered_product_1", "offered_product_2", "offered_product_3"]})
     ]
     inlines = [MemberInline]
